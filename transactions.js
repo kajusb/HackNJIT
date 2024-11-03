@@ -1,3 +1,5 @@
+const sums = {};
+
 const transactions = [
   {
     OrderID: 270867.0,
@@ -40651,6 +40653,8 @@ transactions.sort((a, b) => {
 });
 
 function createTransaction(transaction) {
+  if (!sums.hasOwnProperty(transaction.Date)) sums[transaction.Date] = 0;
+  sums[transaction.Date] += parseFloat(transaction.Amount);
   const transactionElement = $(
     `<div class="transaction" data-date="${transaction.Date}" data-total="${transaction.Amount}"></div>`
   );
@@ -40812,7 +40816,7 @@ $(document).ready(function () {
   });
 
   createTransactions();
-
+  console.log(sums)
   $("#button").click(function () {
     filter();
   });

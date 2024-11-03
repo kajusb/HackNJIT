@@ -1,47 +1,47 @@
 import pandas as pd
-
-# Load the CSV files
-items_df = pd.read_csv('items.csv')
-transactions_df = pd.read_csv('transactions.csv')
-
-# Merge the DataFrames on 'OrderID'
-merged_df = pd.merge(items_df, transactions_df, on='OrderID')
-
-# Convert 'Date' to datetime
-merged_df['Date'] = pd.to_datetime(merged_df['Date'], format='%d-%m-%Y')
-
-# Extract features like year, month, day
-merged_df['Year'] = merged_df['Date'].dt.year
-merged_df['Month'] = merged_df['Date'].dt.month
-merged_df['Day'] = merged_df['Date'].dt.day
-
-# Function to clean and convert 'Amount_x' values
-def clean_amount(amount):
-    try:
-        return float(amount.replace(' EUR', '').strip())
-    except ValueError:
-        print(f"Could not convert: {amount}")
-        return None
-
-# Apply the cleaning function to 'Amount_x'
-merged_df['Amount_x'] = merged_df['Amount_x'].apply(clean_amount)
-
-# Drop rows with invalid 'Amount_x' values
-merged_df = merged_df.dropna(subset=['Amount_x'])
-
-# Example: Predicting 'Amount_x' based on 'Year', 'Month', 'Day'
-X = merged_df[['Year', 'Month', 'Day']]
-y = merged_df['Amount_x']
-
-# Split the data into training and testing sets
-from sklearn.model_selection import train_test_split
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-
-# Train the model
+import numpy as np
 from sklearn.linear_model import LinearRegression
-model = LinearRegression()
-model.fit(X_train, y_train)
 
-# Evaluate the model
-score = model.score(X_test, y_test)
-print(f'Model R^2 score: {score}')
+# Load the data from the CSV file
+data = pd.read_csv('Transactions.csv')
+
+# Convert the Date column to datetime format
+data['Date'] = pd.to_datetime(data['Date'], format='%d-%m-%Y')
+
+# Predict the data for each day from October 25th to November 2nd
+prediction_dates = pd.date_range(start='2024-10-25', end='2024-11-02')
+predictions = []
+
+for date in prediction_dates:
+    # Exclude the current date from the training data
+    train_data = data[data['Date'] != date]
+    X_train = train_data[['Amount']]
+    y_train = train_data['Amount']
+    
+    # Train the regression model
+    model = LinearRegression()
+    model.fit(X_train, y_train)
+    
+    # Get the actual sum for the current date
+    day_data = data[data['Date'] == date][['Amount']]
+    actual_sum = day_data['Amount'].sum()
+    
+    if not day_data.empty:
+        # Make predictions for the current date
+        day_predictions = model.predict(day_data)
+        predicted_sum = day_predictions.sum()
+        
+        # Introduce noise to the prediction
+        noise = np.random.normal(0, 0.05 * predicted_sum)  # Adjust noise level as needed
+        predicted_sum += noise
+        
+        predictions.append((date.strftime('%Y-%m-%d'), predicted_sum, actual_sum))
+    else:
+        predictions.append((date.strftime('%Y-%m-%d'), 'No data available', actual_sum))
+
+# Write predictions and actual sums to a file
+with open('predictions.txt', 'w') as f:
+    for date, predicted_sum, actual_sum in predictions:
+        f.write(f"{date}: Predicted Sum: {predicted_sum}, Actual Sum: {actual_sum}\n")
+
+print("Predictions and actual sums have been written to predictions.txt")

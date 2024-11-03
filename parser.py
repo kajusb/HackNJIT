@@ -28,19 +28,20 @@ try:
     for file in files:
         items = []
         file_path = os.path.join(transactions_directory, file)
+        total = ""
+        calculated_total = 0
+        # total = ""
+        tax = 0
+        order_no = ""
+        date = ""
+        time = ""
+        currency = ""
         with open(file_path, 'r', encoding="utf-8") as f:
             lines = f.readlines()
             file_name = file
             write = False
             access = False
             # tax = ""
-            total = 0
-            # total = ""
-            tax = 0
-            order_no = ""
-            date = ""
-            time = ""
-            currency = ""
             for i in range(len(lines) - 1):
                 line = lines[i].strip()
                 if "Order No:" in line:
@@ -61,14 +62,15 @@ try:
                     access = True
                     write = True
                 
-                # if "Total amount:" in line:
-                #     start_index = line.find("Total amount:") + len("Total amount:")
-                #     total = line[start_index:].strip()
+                if "Total amount:" in line:
+                    start_index = line.find("Total amount:") + len("Total amount:")
+                    total = line[start_index:].strip()
+                    total = total.replace(" EUR","").replace(" GBP","")
 
                 if "VAT amount:" in line:
                     start_index = line.find("VAT amount:") + len("VAT amount:")
-                    tax_curreny = line[start_index:].strip()
-                    if len(tax_curreny.replace("EUR","")) < len(tax_curreny):
+                    tax_currency = line[start_index:].strip()
+                    if len(tax_currency.replace("EUR","")) < len(tax_currency):
                         currency = "EUR"
                     else:
                         currency = "GBP"
@@ -86,13 +88,14 @@ try:
                         with open(ItemsFile, mode='a', newline='') as file:
                             writer = csv.writer(file)
                             writer.writerow([order_no, parts[1], parts[0], parts[2], parts[5], parts[4], parts[3]])
-
-                        total += int(parts[0]) * float(parts[2])
+                        calculated_total += int(parts[0]) * float(parts[2])
                         tax += int(parts[0]) * float(parts[5])
-            if write:
-                with open(transactionsFile, mode='a', newline='') as file:
-                    writer = csv.writer(file)
-                    writer.writerow([order_no, round(total,2), round(tax,2), currency, date, time, file_name])
+        if write:
+            if total == "":
+                total = calculated_total
+            with open(transactionsFile, mode='a', newline='') as file:
+                writer = csv.writer(file)
+                writer.writerow([order_no, round(float(total),2), round(tax,2), currency, date, time, file_name])
 except FileNotFoundError:
     print(f"The directory {transactions_directory} does not exist.")
 except PermissionError:
