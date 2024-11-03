@@ -1,8 +1,37 @@
 <html>
     <head>
-        <title></title>
+        <title>Percepta</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="stylesheet" href="main.css">
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap" rel="stylesheet">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/3.3.4/jquery.inputmask.bundle.min.js"></script>
+        <script src="main.js" defer></script>
     </head>
     <body>
+        <div class="header">Filters</div>
+        <div id="filters">
+            <div id="date">
+                <div class="icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M3.84172 0.0566584C3.46016 0.229144 3.34517 0.490485 3.34517 1.16475V1.65607H2.78068C2.13255 1.65607 1.74576 1.7397 1.30148 1.97491C0.935603 2.17353 0.480869 2.63349 0.292703 3.00459C0.031361 3.52205 0 3.75726 0 5.27304V6.67383H11.7081H23.4162V5.27304C23.4162 3.72589 23.3849 3.50114 23.0974 2.95755C23.0085 2.79029 22.7994 2.52372 22.6374 2.37215C22.0938 1.85469 21.5398 1.65607 20.6408 1.65607H20.0815L20.0606 1.08634C20.0501 0.605476 20.0292 0.490485 19.9351 0.370268C19.7313 0.0932462 19.564 0.00961688 19.2347 0.00961688C18.9055 0.00961688 18.7382 0.0932462 18.5343 0.370268C18.4403 0.490485 18.4194 0.605476 18.4089 1.08634L18.388 1.65607H16.7259H15.0637L15.0428 1.08634C15.0271 0.469578 14.9801 0.349361 14.6665 0.11938C14.4626 -0.0321978 13.9713 -0.0321978 13.7675 0.11938C13.4539 0.349361 13.4068 0.469578 13.3911 1.08634L13.3702 1.65607H11.7081H10.046L10.0251 1.08634C10.0094 0.469578 9.96234 0.349361 9.64873 0.11938C9.44489 -0.0321978 8.95356 -0.0321978 8.74972 0.11938C8.43611 0.349361 8.38907 0.469578 8.37339 1.08634L8.35248 1.65607H6.69035H5.02821L5.00731 1.08634C4.99163 0.469578 4.94458 0.349361 4.64143 0.124607C4.46372 -0.00606362 4.0508 -0.0426514 3.84172 0.0566584Z" fill="#474747" fill-opacity="0.7"/>
+                        <path d="M0.000115204 14.765C0.000115204 21.8265 -0.0155653 21.4658 0.318952 22.0983C0.517572 22.4642 0.977533 22.9189 1.34864 23.1071C1.96018 23.4155 1.35909 23.3998 11.7082 23.3998C22.1567 23.3998 21.4719 23.4207 22.1148 23.0809C22.7159 22.7569 23.2334 22.0513 23.3641 21.3665C23.3954 21.1836 23.4163 18.8315 23.4163 14.718V8.3465H11.7082H0.000115204V14.765Z" fill="#474747" fill-opacity="0.7"/>
+                    </svg>    
+                </div>
+                <div id="start"><input type="text"  placeholder="Start"></div>
+                <div id="end"><input type="text" placeholder="End"></div>
+            </div>
+            <div id="amount">
+                <div class="icon">
+                    <svg width="15" height="24" viewBox="0 0 15 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M7.19028 0.0742607C6.97457 0.156561 6.79995 0.298304 6.68696 0.481197C6.61506 0.590933 6.59452 0.80126 6.57397 1.59685L6.54829 2.5799L5.93198 2.65763C4.2474 2.87253 2.94802 3.39377 1.9157 4.26709C0.821746 5.19527 0.297883 6.28348 0.303019 7.63689C0.308155 8.94001 0.713892 9.83618 1.67944 10.6592C2.10573 11.0296 2.76312 11.4136 3.43079 11.6925C3.85194 11.8709 5.40298 12.351 6.2915 12.5796L6.54829 12.6482L6.5637 15.5882L6.57397 18.5328L6.27609 18.5007C5.08969 18.3819 3.47188 17.7463 2.34198 16.9507C1.81811 16.5849 1.46887 16.4981 1.01691 16.6169C0.426281 16.7678 0 17.2708 0 17.824C0 18.2904 0.133534 18.5007 0.70362 18.9168C1.7154 19.6575 3.15345 20.3114 4.41689 20.5994C4.89453 20.7092 5.83954 20.8509 6.11174 20.8509C6.60479 20.8555 6.57397 20.7869 6.57397 21.8111C6.57397 22.6661 6.57911 22.721 6.6921 22.913C7.00539 23.4434 7.79118 23.5669 8.29964 23.1691C8.63347 22.913 8.64888 22.849 8.66943 21.802L8.68997 20.8555L8.98272 20.8281C11.7715 20.5674 13.7334 19.4472 14.5603 17.6411C15.0431 16.5941 15.1407 15.1218 14.7914 14.0976C14.1957 12.351 12.5933 11.2627 9.37818 10.4306L8.70538 10.2523L8.68997 7.64604L8.6797 5.03981L9.0238 5.10839C9.938 5.28671 10.9087 5.65707 11.6637 6.10973C12.3108 6.49381 12.4495 6.54868 12.7936 6.54411C13.564 6.54411 14.1854 5.99085 14.1854 5.30958C14.1854 4.78833 13.9491 4.51856 12.999 3.95617C11.7818 3.23831 10.3951 2.7948 8.97758 2.67134L8.62834 2.64391V1.66086C8.62834 0.792116 8.61807 0.664091 8.53076 0.513203C8.2791 0.0742607 7.68847 -0.117779 7.19028 0.0742607ZM6.57397 7.33969C6.57397 9.34694 6.5637 9.74016 6.50207 9.74016C6.34286 9.74016 5.18214 9.36066 4.73531 9.16405C4.119 8.88971 3.66191 8.50563 3.48729 8.11241C3.39484 7.89294 3.36916 7.76035 3.3743 7.40828C3.37943 6.73157 3.62596 6.22404 4.18577 5.77138C4.70963 5.34616 5.69059 4.99409 6.48666 4.94379C6.56884 4.93922 6.57397 5.08096 6.57397 7.33969ZM9.51171 13.4483C11.1655 13.965 11.8794 14.628 11.9513 15.6933C12.0283 16.7907 11.3658 17.7235 10.1691 18.2127C9.84555 18.3407 8.97244 18.5648 8.77728 18.5648C8.68483 18.5648 8.6797 18.4733 8.6797 15.8899V13.2151L8.8235 13.2426C8.90054 13.2609 9.2087 13.3523 9.51171 13.4483Z" fill="#616161" fill-opacity="0.7"/>
+                    </svg>
+                </div>
+                <div id="minimum"><input type="text" placeholder="Minimum"></div>
+                <div id="maximum"><input type="text" placeholder="Maximum"></div>
+            </div>
+        </div>
+        <div class="header">Transactions</div>
         <div id="transactions">
             <div class="transaction">
                 <div class="date-time-and-total">
@@ -31,12 +60,82 @@
                         </div>
                         <div class="value">3:00 PM</div>
                     </div>
-                    <div class="amount">€49.99</div>
+                    <div class="total">€49.99</div>
                 </div>
                 <div class="items">
                     <div class="item">
-                        
+                        <div class="quantity">
+                            <div class="number">2</div>
+                        </div>
+                        <div class="name">Chicken Caesars</div>
+                        <div class="vat">
+                            <div class="label">VAT</div>
+                            <div class="percentage">18%</div>
+                            <div class="tax">€114.00</div>
+                        </div>
+                        <div class="amount">€5.09</div>
                     </div>
+                    <div class="item">
+                        <div class="quantity">
+                            <div class="number">2</div>
+                        </div>
+                        <div class="name">Chicken Caesars</div>
+                        <div class="vat">
+                            <div class="label">VAT</div>
+                            <div class="percentage">18%</div>
+                            <div class="tax">€114.00</div>
+                        </div>
+                        <div class="amount">€5.09</div>
+                    </div>
+                    <div class="item">
+                        <div class="quantity">
+                            <div class="number">2</div>
+                        </div>
+                        <div class="name">Chicken Caesars</div>
+                        <div class="vat">
+                            <div class="label">VAT</div>
+                            <div class="percentage">18%</div>
+                            <div class="tax">€114.00</div>
+                        </div>
+                        <div class="amount">€5.09</div>
+                    </div>
+                    <div class="item">
+                        <div class="quantity">
+                            <div class="number">2</div>
+                        </div>
+                        <div class="name">Chicken Caesars</div>
+                        <div class="vat">
+                            <div class="label">VAT</div>
+                            <div class="percentage">18%</div>
+                            <div class="tax">€114.00</div>
+                        </div>
+                        <div class="amount">€5.09</div>
+                    </div>
+                    <div class="item">
+                        <div class="quantity">
+                            <div class="number">2</div>
+                        </div>
+                        <div class="name">Chicken Caesars</div>
+                        <div class="vat">
+                            <div class="label">VAT</div>
+                            <div class="percentage">18%</div>
+                            <div class="tax">€114.00</div>
+                        </div>
+                        <div class="amount">€5.09</div>
+                    </div>
+                    <div class="item">
+                        <div class="quantity">
+                            <div class="number">2</div>
+                        </div>
+                        <div class="name">Chicken Caesars</div>
+                        <div class="vat">
+                            <div class="label">VAT</div>
+                            <div class="percentage">18%</div>
+                            <div class="tax">€114.00</div>
+                        </div>
+                        <div class="amount">€5.09</div>
+                    </div>
+
                 </div>
             </div>
         </div>
