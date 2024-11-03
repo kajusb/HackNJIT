@@ -16,11 +16,11 @@ ItemsFile = "Items.csv"
 # Writing to csv file
 with open(transactionsFile, mode='w', newline='') as file:
     writer = csv.writer(file)
-    writer.writerow(["OrderID","Amount","Tax", "Currency","Date", "Time", "FileName"])
+    writer.writerow(["OrderNumber","Amount","Tax", "Currency","Date", "Time", "FileName"])
 
 with open(ItemsFile, mode='w', newline='') as file:
     writer = csv.writer(file)
-    writer.writerow(["OrderID","Name","Quantity","Amount", "VAT","VAT%", "Currency"])
+    writer.writerow(["TransactionID","itemName","Quantity","Amount", "VAT","VATPercent", "Currency"])
 
 try:
     # List all files in the Transactions directory
@@ -85,6 +85,7 @@ try:
                         parts = line.replace(" -","").replace(" //","").replace("VAT: ","").split(" ")
                         # if currency == "":
                         #     currency = parts[3]
+
                         with open(ItemsFile, mode='a', newline='') as file:
                             writer = csv.writer(file)
                             writer.writerow([order_no, parts[1], parts[0], parts[2], parts[5], parts[4], parts[3]])
@@ -93,9 +94,10 @@ try:
         if write:
             if total == "":
                 total = calculated_total
-            with open(transactionsFile, mode='a', newline='') as file:
-                writer = csv.writer(file)
-                writer.writerow([order_no, round(float(total),2), round(tax,2), currency, date, time, file_name])
+            if order_no != "":
+                with open(transactionsFile, mode='a', newline='') as file:
+                    writer = csv.writer(file)
+                    writer.writerow([order_no, round(float(total),2), round(tax,2), currency, date, time, file_name])
 except FileNotFoundError:
     print(f"The directory {transactions_directory} does not exist.")
 except PermissionError:

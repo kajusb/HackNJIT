@@ -1,11 +1,17 @@
+# Imports
 import os
+import csv
 from flask import Flask, request, jsonify
 import psycopg2
 from psycopg2.extras import RealDictCursor
 from dotenv import load_dotenv
 from datetime import datetime, date, time
+from flask_cors import CORS
 
+
+# Flask
 app = Flask(__name__)
+CORS(app)
 load_dotenv()
 
 # Postgres Connection
@@ -18,6 +24,83 @@ def get_db_connection():
     )
     return conn
 
+# Function to insert transactions from CSV
+def insert_transactions_from_csv(conn, csv_file_path):
+    with open(csv_file_path, mode='r') as file:
+        reader = csv.DictReader(file)
+        with conn.cursor() as cur:
+            for row in reader:
+
+                # Remove Orders with Blank #
+                if row["OrderNumber"] == "":
+                    continue
+                
+                # Parse the date from DD-MM-YYYY to YYYY-MM-DD
+                date_str = datetime.strptime(row["Date"], '%d-%m-%Y').date()
+
+                # Add transactions to table while reading
+                cur.execute(
+                    '''
+                    INSERT INTO "Transactions" ("OrderNumber", "Amount", "Tax", "Date", "Time", "Currency")
+                    VALUES (%s, %s, %s, %s, %s, %s) RETURNING "ID";
+                    ''',
+                    (
+                        row["OrderNumber"],
+                        float(row["Amount"]),
+                        float(row["Tax"]),
+                        date_str,
+                        row["Time"],
+                        row["Currency"]
+                    )
+                )
+            conn.commit()
+
+# Function to insert items from CSV
+def insert_items_from_csv(conn, csv_file_path):
+    with open(csv_file_path, mode='r') as file:
+        reader = csv.DictReader(file)
+        with conn.cursor() as cur:
+            for row in reader:
+
+                # Add items to table while reading
+                cur.execute(
+                    '''
+                    INSERT INTO "Items" ("Currency", "TransactionID", "Quantity", "itemName", "Amount", "VAT", "VATPercent")
+                    VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING "ID";
+                    ''',
+                    (
+                        row["Currency"],
+                        row["TransactionID"],
+                        row["Quantity"],
+                        row["itemName"],
+                        row["Amount"],
+                        row["VAT"],
+                        row["VATPercent"].replace("%", "")
+                    ), 
+                )
+                
+                # Match item's transaction ID with transaction's ID
+                cur.execute(
+                    '''
+                    UPDATE "Items"
+                    SET "TransactionID" = "Transactions"."ID"
+                    FROM "Transactions"
+                    WHERE "TransactionID" = "OrderNumber"       
+                    '''
+                )
+            conn.commit()
+
+# Populate database from CSV files
+@app.route("/populate_db", methods=["POST"])
+def populate_db():
+    conn = get_db_connection()
+    try:
+        insert_transactions_from_csv(conn, 'Transactions.csv')
+        insert_items_from_csv(conn, 'Items.csv')
+        return jsonify({"message": "Database populated successfully!"}), 200
+    finally:
+        conn.close()
+
 # Gets all transactions
 @app.route("/")
 def home():
@@ -25,38 +108,37 @@ def home():
     
     # Fetch transactions
     trans_cur = conn.cursor(cursor_factory=RealDictCursor)
-    trans_cur.execute('SELECT * FROM \"Transactions\";')
+    trans_cur.execute('SELECT * FROM "Transactions" ORDER BY "Date" ASC')
     transactions = trans_cur.fetchall()
     
     # Convert date and time fields to string format for JSON serialization
     for transaction in transactions:
+        transaction["Amount"] = transaction.get("Amount").replace("$", "")
         if isinstance(transaction.get("Date"), date):
             transaction["Date"] = transaction["Date"].strftime('%Y-%m-%d')
         if isinstance(transaction.get("Time"), time):
             transaction["Time"] = transaction["Time"].strftime('%H:%M:%S')
+
         # Initialize items list in the transaction
         transaction["Items"] = []
     
     # Fetch items
     items_cur = conn.cursor(cursor_factory=RealDictCursor)
-    items_cur.execute('SELECT * FROM \"Items\";')
+    items_cur.execute('SELECT * FROM "Items";')
     items = items_cur.fetchall()
     
     # Close cursors
     trans_cur.close()
-    items_cur.close()
 
     # Group items by transaction
     for item in items:
+        item["Amount"] = item.get("Amount").replace("$", "")
+
         transaction_id = item["TransactionID"]
         for transaction in transactions:
             if transaction["ID"] == transaction_id:
                 transaction["Items"].append(item)
-    
-    conn.close()
-
     return jsonify(transactions)
-
 
 # GET
 @app.route("/transaction/<int:trans_id>", methods=["GET"])
