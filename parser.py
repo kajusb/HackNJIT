@@ -31,6 +31,7 @@ try:
         with open(file_path, 'r', encoding="utf-8") as f:
             lines = f.readlines()
             file_name = file
+            write = False
             access = False
             tax = ""
             total = ""
@@ -55,6 +56,7 @@ try:
 
                 if lines[i - 1].strip() == "Ordered:" and line == "--------------------------------":
                     access = True
+                    write = True
                 
                 if "Total amount:" in line:
                     start_index = line.find("Total amount:") + len("Total amount:")
@@ -80,9 +82,10 @@ try:
                             with open(ItemsFile, mode='a', newline='') as file:
                                 writer = csv.writer(file)
                                 writer.writerow([order_no, parts[6].replace("EUR",""), parts[0], parts[8], parts[11], parts[10].replace("%",""), parts[3]])
-            with open(transactionsFile, mode='a', newline='') as file:
-                writer = csv.writer(file)
-                writer.writerow([order_no, total, tax, "EUR", date, time, file_name])
+            if write:
+                with open(transactionsFile, mode='a', newline='') as file:
+                    writer = csv.writer(file)
+                    writer.writerow([order_no, total, tax, "EUR", date, time, file_name])
 except FileNotFoundError:
     print(f"The directory {transactions_directory} does not exist.")
 except PermissionError:
