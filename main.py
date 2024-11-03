@@ -22,20 +22,41 @@ def get_db_connection():
 @app.route("/")
 def home():
     conn = get_db_connection()
-    cur = conn.cursor(cursor_factory=RealDictCursor)
-    cur.execute('SELECT * FROM "Transactions";')
-    transactions = cur.fetchall()
-    cur.close()
-    conn.close()
-
-    # Converts date and time fields to string format for JSON serialization
+    
+    # Fetch transactions
+    trans_cur = conn.cursor(cursor_factory=RealDictCursor)
+    trans_cur.execute('SELECT * FROM \"Transactions\";')
+    transactions = trans_cur.fetchall()
+    
+    # Convert date and time fields to string format for JSON serialization
     for transaction in transactions:
         if isinstance(transaction.get("Date"), date):
             transaction["Date"] = transaction["Date"].strftime('%Y-%m-%d')
         if isinstance(transaction.get("Time"), time):
             transaction["Time"] = transaction["Time"].strftime('%H:%M:%S')
+        # Initialize items list in the transaction
+        transaction["Items"] = []
+    
+    # Fetch items
+    items_cur = conn.cursor(cursor_factory=RealDictCursor)
+    items_cur.execute('SELECT * FROM \"Items\";')
+    items = items_cur.fetchall()
+    
+    # Close cursors
+    trans_cur.close()
+    items_cur.close()
+
+    # Group items by transaction
+    for item in items:
+        transaction_id = item["TransactionID"]
+        for transaction in transactions:
+            if transaction["ID"] == transaction_id:
+                transaction["Items"].append(item)
+    
+    conn.close()
 
     return jsonify(transactions)
+
 
 # GET
 @app.route("/transaction/<int:trans_id>", methods=["GET"])
@@ -90,18 +111,6 @@ def del_trans(trans_id):
     conn.close()
     return jsonify({"message": "Transaction deleted"}), 200
 
-
-# Gets all items
-@app.route("/items", methods=["GET"])
-def get_items():
-    conn = get_db_connection()
-    cur = conn.cursor(cursor_factory=RealDictCursor)
-    cur.execute('SELECT * FROM \"Items\";')
-    items = cur.fetchall()
-    cur.close()
-    conn.close()
-    return jsonify(items)
-
 @app.route("/item/<int:item_id>", methods=["GET"])
 def get_item(item_id):
     conn = get_db_connection()
@@ -119,7 +128,7 @@ def new_item():
     cur = conn.cursor()
     cur.execute(
         "INSERT INTO \"Items\" (\"Currency\", \"TransactionID\", \"Quantity\", \"itemName\", \"Amount\", \"VAT\", \"VATPercent\") VALUES (%s, %s, %s, %s, %s, %s, %s) RETURNING \"ID\";",
-        (data["Currency"], data["TransactionID"], data["Quantity"], data["itemName"], data["Amount"], data["VAT"], data["vatPercent"])
+        (data["Currency"], data["TransactionID"], data["Quantity"], data["itemName"], data["Amount"], data["VAT"], data["VATPercent"])
     )
     item_id = cur.fetchone()[0]
     conn.commit()
