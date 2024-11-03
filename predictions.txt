@@ -1,7 +1,7 @@
-2024-10-25: Predicted Sum: 3242.327683680832, Actual Sum: 3355.87, Accuracy 96.617%
+2024-10-25: Predicted Sum: 3242.327683680832, Actual Sum: 3355.87, Accuracy 96.617
 2024-10-26: Predicted Sum: 7064.099113661729, Actual Sum: 7077.93, Accuracy 99.805
 2024-10-27: Predicted Sum: 2650.5498622167047, Actual Sum: 2604.83, Accuracy 98.245
-2024-10-28: Predicted Sum: 5853.817600089427, Actual Sum: 6101.5599999999995, Accuracy 95.940;
+2024-10-28: Predicted Sum: 5853.817600089427, Actual Sum: 6101.5599999999995, Accuracy 95.940
 2024-10-29: Predicted Sum: 6025.696772579394, Actual Sum: 5595.4400000000005, Accuracy 92.311
 2024-10-30: Predicted Sum: 5576.0480253921405, Actual Sum: 5638.49, Accuracy 98.893
 2024-10-31: Predicted Sum: 5115.140850088941, Actual Sum: 5185.32, Accuracy 98.647
