@@ -33,11 +33,14 @@ try:
             file_name = file
             write = False
             access = False
-            tax = ""
-            total = ""
+            # tax = ""
+            total = 0
+            # total = ""
+            tax = 0
             order_no = ""
             date = ""
             time = ""
+            currency = ""
             for i in range(len(lines) - 1):
                 line = lines[i].strip()
                 if "Order No:" in line:
@@ -47,7 +50,7 @@ try:
                 if "Date/Time Ordered " in line:
                     date_and_time = line.replace("Date/Time Ordered (","").replace(")","")
                     date_and_time = date_and_time.split(" ")
-                    print(date_and_time)
+                    # print(date_and_time)
                     date = date_and_time[0]
                     time = date_and_time[1]
 
@@ -58,34 +61,38 @@ try:
                     access = True
                     write = True
                 
-                if "Total amount:" in line:
-                    start_index = line.find("Total amount:") + len("Total amount:")
-                    total = line[start_index:].strip()
+                # if "Total amount:" in line:
+                #     start_index = line.find("Total amount:") + len("Total amount:")
+                #     total = line[start_index:].strip()
 
                 if "VAT amount:" in line:
                     start_index = line.find("VAT amount:") + len("VAT amount:")
-                    tax = line[start_index:].strip()
-                    tax = tax.replace(" EUR[mag][bold: off]","")
+                    tax_curreny = line[start_index:].strip()
+                    if len(tax_curreny.replace("EUR","")) < len(tax_curreny):
+                        currency = "EUR"
+                    else:
+                        currency = "GBP"
+                    # tax = tax.replace(" EUR","")
+                    # tax = tax.replace(" GBP","")
+                    # tax = tax.replace("[mag][bold: off]","")
                 
                 if access:
                     # print(lines[i])
                     pattern = re.compile(r'\d+ - \w+ // \d+\.\d{2} EUR // VAT: \d+\.\d{2}% \d+\.\d{2} EUR')
                     if pattern.match(line):
                         parts = line.replace(" -","").replace(" //","").replace("VAT: ","").split(" ")
-                        print(parts)
+                        # if currency == "":
+                        #     currency = parts[3]
                         with open(ItemsFile, mode='a', newline='') as file:
                             writer = csv.writer(file)
                             writer.writerow([order_no, parts[1], parts[0], parts[2], parts[5], parts[4], parts[3]])
 
-                        if parts[6] != "EUR":
-                            print(parts[6])
-                            with open(ItemsFile, mode='a', newline='') as file:
-                                writer = csv.writer(file)
-                                writer.writerow([order_no, parts[6].replace("EUR",""), parts[0], parts[8], parts[11], parts[10].replace("%",""), parts[3]])
+                        total += int(parts[0]) * float(parts[2])
+                        tax += int(parts[0]) * float(parts[5])
             if write:
                 with open(transactionsFile, mode='a', newline='') as file:
                     writer = csv.writer(file)
-                    writer.writerow([order_no, total, tax, "EUR", date, time, file_name])
+                    writer.writerow([order_no, round(total,2), round(tax,2), currency, date, time, file_name])
 except FileNotFoundError:
     print(f"The directory {transactions_directory} does not exist.")
 except PermissionError:
